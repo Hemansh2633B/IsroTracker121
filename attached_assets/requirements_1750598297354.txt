@@ -1,0 +1,10 @@
+tensorflow==2.16.1
+numpy==1.26.0
+matplotlib==3.5.1
+scikit-learn==1.3.2
+Pillow==11.2.1
+opencv-python==4.11.0.86
+requests==2.26.0
+h5py==3.10.0
+tqdm==4.62.3
+imageio==2.9.0
