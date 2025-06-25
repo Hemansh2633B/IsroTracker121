@@ -18,15 +18,44 @@ import { AdminPanel } from "@/components/admin-panel";
 import { useState, useEffect } from "react";
 import * as React from "react";
 
+// Define types for shared state (can be moved to lib/types.ts later)
+interface PredictionOverlayData { // Matches structure in SatelliteMap
+  id: string;
+  type: "geojson";
+  data: GeoJSON.FeatureCollection;
+  style?: L.PathOptions;
+}
+
+interface SelectedPredictionDetail { // Example, expand as needed
+  id?: string;
+  name?: string;
+  confidence?: number;
+  area?: number; // Example metric
+  properties?: any;
+}
+
 export default function Dashboard() {
   const [showAdmin, setShowAdmin] = useState(false);
 
-  // Check for admin hash in URL
+  // Shared state for analysis results and selected details
+  const [predictionOverlays, setPredictionOverlays] = useState<PredictionOverlayData[]>([]);
+  const [selectedPrediction, setSelectedPrediction] = useState<SelectedPredictionDetail | null>(null);
+  const [analysisParams, setAnalysisParams] = useState<{date: string; source: string} | null>(null);
+
+
   useEffect(() => {
     if (window.location.hash === '#admin') {
       setShowAdmin(true);
     }
   }, []);
+
+  const handleStartAnalysis = (params: {date: string; source: string}) => {
+    console.log("Dashboard: Analysis triggered with params", params);
+    setAnalysisParams(params); // CloudAnalysisEngine can watch this
+    // For now, CloudAnalysisEngine will fetch and then call setPredictionOverlays
+    // In a more advanced setup, this function might directly call a method on CloudAnalysisEngine
+    // or CloudAnalysisEngine would use a mutation that updates a shared query cache.
+  };
 
   if (showAdmin) {
     return (
@@ -53,43 +82,34 @@ export default function Dashboard() {
         <Sidebar />
         <main className="flex-1 overflow-y-auto">
           <div className="p-6 space-y-6">
+            {/* MetricsCards might also need access to some high-level summary from analysis */}
             <MetricsCards />
             
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2">
-                <SatelliteMap />
+                <SatelliteMap
+                  predictionOverlays={predictionOverlays}
+                  onSelectPrediction={setSelectedPrediction} // Pass setter to map
+                  onInitiateAnalysis={handleStartAnalysis} // Pass analysis trigger
+                />
               </div>
               <div className="space-y-6">
-                <ImageUpload />
+                <ImageUpload /> {/* This might feed into available data for analysis */}
+                {/* Original Quick Stats - could be replaced or enhanced by DetectionResults */}
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200">
                   <div className="p-4 border-b border-gray-200">
-                    <h3 className="text-lg font-semibold text-gray-900">Quick Stats</h3>
+                    <h3 className="text-lg font-semibold text-gray-900">Selection Details</h3>
                   </div>
-                  <div className="p-4 space-y-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600">Tracked Storms</span>
-                      <span className="font-semibold text-gray-900">18</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600">Avg. Movement Speed</span>
-                      <span className="font-semibold text-gray-900">12 km/h</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600">Coverage Area</span>
-                      <span className="font-semibold text-gray-900">2.4M km²</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600">Data Quality</span>
-                      <span className="text-green-600 font-semibold">Excellent</span>
-                    </div>
-                  </div>
+                  {/* DetectionResults will now show selectedPrediction */}
+                  <DetectionResults selectedPrediction={selectedPrediction} />
                 </div>
               </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <DetectionResults />
-              <ProcessingPipeline />
+              {/* DetectionResults moved above, this could be other components or a log */}
+              <div>{/* Placeholder for other content if DetectionResults is moved */}</div>
+              <ProcessingPipeline /> {/* This might show status of backend processing */}
               <ISTRACMonitor />
             </div>
 
@@ -98,14 +118,15 @@ export default function Dashboard() {
               <SecurityMonitor />
             </div>
             
-            <CloudAnalysisEngine />
+            {/* CloudAnalysisEngine will use analysisParams and call setPredictionOverlays */}
+            <CloudAnalysisEngine
+                analysisParams={analysisParams}
+                onAnalysisComplete={setPredictionOverlays} // Engine calls this with new overlays
+            />
             
             <PaperGenerator />
-            
             <NASADataIntegration />
-            
-            <DeepLearningPanel />
-            
+            <DeepLearningPanel /> {/* This might interact with training scripts/results */}
             <ExportPanel />
           </div>
         </main>

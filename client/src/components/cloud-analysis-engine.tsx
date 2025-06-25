@@ -1,360 +1,270 @@
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"; // Added CardHeader, CardTitle
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
-import { Brain, Layers, Activity, BarChart3, Satellite, Database, AlertTriangle } from "lucide-react";
-import { useState } from "react";
+import { apiRequest } from "@/lib/queryClient"; // Assuming this is a utility for API calls
+import { Brain, Layers, Activity, BarChart3, Satellite, Database, AlertTriangle, PlayCircle } from "lucide-react"; // Added PlayCircle
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 
+// Types from dashboard (or move to lib/types.ts)
+interface PredictionOverlayData {
+  id: string;
+  type: "geojson";
+  data: GeoJSON.FeatureCollection;
+  style?: L.PathOptions;
+}
+interface AnalysisParams {
+  date: string;
+  source: string;
+  bounds?: string; // Optional map bounds
+}
+
+// Existing interface from the file
 interface CloudClusterAnalysis {
   id: string;
   timestamp: string;
   brightness_temperature: {
-    ir1: number;
-    ir2: number;
-    wv: number;
-    vis: number;
+    ir1: number; ir2: number; wv: number; vis: number;
   };
   segmentation_results: {
-    confidence: number;
-    cluster_count: number;
-    total_area: number;
-    density_map: number[][];
+    confidence: number; cluster_count: number; total_area: number; density_map: number[][];
   };
   tracking_data: {
-    movement_vector: { x: number; y: number };
-    speed: number;
-    direction: number;
-    persistence: number;
+    movement_vector: { x: number; y: number }; speed: number; direction: number; persistence: number;
   };
   reanalysis_validation: {
-    era5_correlation: number;
-    ncep_agreement: number;
-    validation_score: number;
+    era5_correlation: number; ncep_agreement: number; validation_score: number;
   };
 }
 
-export function CloudAnalysisEngine() {
-  const [activeAnalysis, setActiveAnalysis] = useState<string | null>(null);
+interface CloudAnalysisEngineProps {
+  analysisParams: AnalysisParams | null; // Received from Dashboard
+  onAnalysisComplete: (overlays: PredictionOverlayData[]) => void; // Callback to Dashboard
+}
+
+export function CloudAnalysisEngine({ analysisParams, onAnalysisComplete }: CloudAnalysisEngineProps) {
+  // Removed local activeAnalysis state, as analysis is now triggered by analysisParams prop
   const [selectedChannels, setSelectedChannels] = useState<string[]>(['ir1', 'ir2', 'wv']);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: analysisResults, isLoading } = useQuery<CloudClusterAnalysis[]>({
-    queryKey: ["/api/cloud-analysis"],
-    refetchInterval: 5000,
+  // This query might be for fetching historical analysis results or status
+  const { data: historicalAnalyses, isLoading: isLoadingHistorical } = useQuery<CloudClusterAnalysis[]>({
+    queryKey: ["/api/cloud-analysis-history"], // Changed key to avoid conflict if /api/cloud-analysis is for triggering
+    // refetchInterval: 5000, // Maybe not needed if this is just history
   });
 
-  const { data: insatData } = useQuery({
-    queryKey: ["/api/insat-data"],
-    refetchInterval: 3000,
+  // This query fetches current INSAT (or other source) data for display in the UI
+  const { data: currentSourceData } = useQuery({
+    queryKey: ["/api/current-source-data", analysisParams?.source], // Keyed by selected source
+    queryFn: async () => {
+      if (!analysisParams?.source) return null; // Don't fetch if no source
+      console.log(`CAE: Fetching current data for source: ${analysisParams.source}`);
+      // Simulate fetching data for the selected source.
+      // Replace with actual API call: await apiRequest("GET", `/api/source-data?source=${analysisParams.source}`);
+      await new Promise(resolve => setTimeout(resolve, 300));
+      if (analysisParams.source === 'simulated_insat') {
+        return { channels: { ir1: 270, ir2: 265, wv: 230, vis: 80 }};
+      }
+      return { channels: { ir1: 275, ir2: 270, wv: 235, vis: 85 }}; // Default for other simulated
+    },
+    enabled: !!analysisParams?.source, // Only run if a source is selected
   });
 
-  const startAnalysisMutation = useMutation({
-    mutationFn: async (params: { channels: string[]; algorithm: string }) => {
-      const response = await apiRequest("POST", "/api/start-cloud-analysis", params);
-      return response.json();
+  const runAnalysisMutation = useMutation({
+    mutationFn: async (params: { date: string; source: string; bounds?: string; algorithm: string; channels: string[] }) => {
+      toast({ title: "Analysis Initiated", description: `Algorithm: ${params.algorithm}, Source: ${params.source}, Date: ${params.date}` });
+      console.log("CAE: Starting analysis mutation with params:", params);
+      // const response = await apiRequest("POST", "/api/start-cloud-analysis", params);
+      // return response.json(); // This should return data compatible with PredictionOverlayData[]
+
+      // --- SIMULATE API call and receiving GeoJSON prediction ---
+      await new Promise(resolve => setTimeout(resolve, 2000 + Math.random()*1000)); // Simulate variable delay
+      const randomId = `pred_${Date.now()}`;
+      const randomLat = (Math.random() * 40 - 20).toFixed(2); // -20 to +20
+      const randomLon = (Math.random() * 80 - 40).toFixed(2); // -40 to +40
+      const simulatedGeoJson: GeoJSON.FeatureCollection = {
+        type: "FeatureCollection",
+        features: [
+          {
+            type: "Feature",
+            properties: {
+              name: `Predicted ${params.algorithm} ${randomId.slice(-4)}`,
+              confidence: Math.random() * 0.3 + 0.65, // 0.65 - 0.95
+              algorithm: params.algorithm,
+              source: params.source,
+              date: params.date,
+            },
+            geometry: { type: "Polygon", coordinates: [ // Example polygon
+                [[parseFloat(randomLon)-1, parseFloat(randomLat)-1], [parseFloat(randomLon)+1, parseFloat(randomLat)-1], [parseFloat(randomLon), parseFloat(randomLat)+1], [parseFloat(randomLon)-1, parseFloat(randomLat)-1]]
+            ]}
+          }
+        ]
+      };
+      return [{ id: randomId, type: "geojson", data: simulatedGeoJson, style: { color: "orange", weight: 2, fillOpacity: 0.25 } }] as PredictionOverlayData[];
+      // --- End Simulation ---
     },
-    onSuccess: () => {
-      toast({
-        title: "Analysis Started",
-        description: "AI/ML cloud cluster identification initiated with INSAT data",
-      });
-      queryClient.invalidateQueries({ queryKey: ["/api/cloud-analysis"] });
+    onSuccess: (data: PredictionOverlayData[]) => {
+      toast({ title: "Analysis Complete", description: "Prediction overlays generated." });
+      onAnalysisComplete(data); // Pass results to Dashboard
+      queryClient.invalidateQueries({ queryKey: ["/api/cloud-analysis-history"] }); // Refresh history if needed
     },
+    onError: (error: Error) => {
+      toast({ title: "Analysis Failed", description: error.message || "Unknown error", variant: "destructive" });
+    }
   });
+
+  // Effect to trigger analysis when analysisParams prop changes from Dashboard
+  useEffect(() => {
+    if (analysisParams) {
+      // Default to U-Net if params are set this way, or could add a UI element in CAE to pick algorithm.
+      // For now, let's assume if `analysisParams` is set, we run a default analysis (e.g., U-Net).
+      // The "Analyze Selected Data" button in SatelliteMap triggers this.
+      // The buttons within CAE can trigger specific algorithms.
+      console.log("CAE: analysisParams changed, triggering default U-Net analysis", analysisParams);
+      handleAlgorithmRun('unet_segmentation'); // Default trigger from map
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [analysisParams]); // Dependency on analysisParams to auto-trigger
+
 
   const handleChannelSelection = (channel: string) => {
     setSelectedChannels(prev => 
-      prev.includes(channel) 
-        ? prev.filter(c => c !== channel)
-        : [...prev, channel]
+      prev.includes(channel) ? prev.filter(c => c !== channel) : [...prev, channel]
     );
   };
 
-  const startAnalysis = (algorithm: string) => {
-    startAnalysisMutation.mutate({
-      channels: selectedChannels,
-      algorithm
-    });
+  const handleAlgorithmRun = (algorithm: string) => {
+    if (!analysisParams && algorithm !== 'reanalysis_validation' && algorithm !== 'multi_channel_local_data_only') {
+        // Some analyses might not need date/source from map if they use fixed/latest data
+        toast({ title: "Selection Required", description: "Please select date and source on the map first, then click 'Analyze Selected Data'.", variant: "default"});
+        // Or, if CloudAnalysisEngine has its own date/source pickers, use those.
+        // For now, we assume analysisParams must be set by the map's "Analyze Selected Data" button.
+        // This button now exists in SatelliteMap and calls `onInitiateAnalysis` which sets `analysisParams` in Dashboard.
+        // So, if `analysisParams` is null, it means user hasn't clicked that button.
+        // The specific buttons below in CAE can now use the `analysisParams` if available.
+        if(!analysisParams) {
+            alert("Please use the 'Analyze Selected Data' button on the map to set context first, then choose a specific algorithm here.");
+            return;
+        }
+    }
+
+    const paramsForMutation = {
+        date: analysisParams?.date || new Date().toISOString().split("T")[0], // Fallback to today
+        source: analysisParams?.source || "simulated_goes", // Fallback
+        bounds: analysisParams?.bounds,
+        algorithm,
+        channels: selectedChannels,
+    };
+    runAnalysisMutation.mutate(paramsForMutation);
   };
 
-  const getValidationColor = (score: number) => {
+
+  const getValidationColor = (score: number = 0) => { // Default score to 0 if undefined
     if (score > 0.8) return 'text-green-600 bg-green-100';
     if (score > 0.6) return 'text-yellow-600 bg-yellow-100';
     return 'text-red-600 bg-red-100';
   };
 
+  const latestHistoricalAnalysis = historicalAnalyses?.[0]; // Example: show latest from history
+
   return (
     <Card className="bg-white shadow-sm border border-gray-200">
-      <div className="p-4 border-b border-gray-200">
+      <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Brain className="h-5 w-5 text-primary" />
-            <h3 className="text-lg font-semibold text-gray-900">AI/ML Cloud Analysis Engine</h3>
+            <CardTitle className="text-lg font-semibold text-gray-900">AI/ML Cloud Analysis Engine</CardTitle>
           </div>
           <Badge variant="secondary">
-            INSAT Real-time Processing
+            {analysisParams ? `${analysisParams.source} @ ${analysisParams.date}` : "Awaiting Data Selection"}
           </Badge>
         </div>
-      </div>
+      </CardHeader>
       
       <CardContent className="p-4">
-        <Tabs defaultValue="analysis" className="w-full">
+        {runAnalysisMutation.isPending && (
+          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-blue-700 text-sm flex items-center">
+            <Activity className="animate-spin h-4 w-4 mr-2" />
+            Analysis in progress for: {runAnalysisMutation.variables?.algorithm}... Please wait.
+          </div>
+        )}
+
+        <Tabs defaultValue="segmentation" className="w-full"> {/* Default to segmentation */}
           <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="analysis">Multi-Channel Analysis</TabsTrigger>
+            <TabsTrigger value="analysis">Multi-Channel</TabsTrigger>
             <TabsTrigger value="segmentation">U-Net Segmentation</TabsTrigger>
             <TabsTrigger value="tracking">Temporal Tracking</TabsTrigger>
-            <TabsTrigger value="validation">Reanalysis Validation</TabsTrigger>
+            <TabsTrigger value="validation">Validation</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="analysis" className="space-y-4">
+          <TabsContent value="analysis" className="space-y-4 mt-4">
             <div>
-              <h4 className="text-sm font-medium text-gray-700 mb-3">Brightness Temperature Analysis</h4>
-              
-              {/* Channel Selection */}
+              <h4 className="text-sm font-medium text-gray-700 mb-3">Brightness Temperature Analysis (Selected Source Data)</h4>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
                 {[
-                  { id: 'ir1', name: 'IR1 (10.8μm)', temp: insatData?.channels?.ir1 || 0 },
-                  { id: 'ir2', name: 'IR2 (12.0μm)', temp: insatData?.channels?.ir2 || 0 },
-                  { id: 'wv', name: 'WV (6.7μm)', temp: insatData?.channels?.wv || 0 },
-                  { id: 'vis', name: 'VIS (0.65μm)', temp: insatData?.channels?.vis || 0 }
+                  { id: 'ir1', name: 'IR1 (10.8μm)', temp: currentSourceData?.channels?.ir1 || 0 },
+                  { id: 'ir2', name: 'IR2 (12.0μm)', temp: currentSourceData?.channels?.ir2 || 0 },
+                  { id: 'wv', name: 'WV (6.7μm)', temp: currentSourceData?.channels?.wv || 0 },
+                  { id: 'vis', name: 'VIS (0.65μm)', temp: currentSourceData?.channels?.vis || 0 }
                 ].map((channel) => (
-                  <div key={channel.id} className={`border rounded-lg p-3 cursor-pointer ${
-                    selectedChannels.includes(channel.id) ? 'border-primary bg-primary/5' : 'border-gray-200'
-                  }`} onClick={() => handleChannelSelection(channel.id)}>
+                  <div key={channel.id} className={`border rounded-lg p-3 cursor-pointer ${selectedChannels.includes(channel.id) ? 'border-primary bg-primary/5' : 'border-gray-200'}`} onClick={() => handleChannelSelection(channel.id)}>
                     <div className="text-sm font-medium">{channel.name}</div>
                     <div className="text-lg font-bold text-primary">{channel.temp.toFixed(1)}K</div>
-                    <div className="text-xs text-gray-500">
-                      {selectedChannels.includes(channel.id) ? 'Selected' : 'Available'}
-                    </div>
+                    <div className="text-xs text-gray-500">{selectedChannels.includes(channel.id) ? 'Selected' : 'Available'}</div>
                   </div>
                 ))}
               </div>
-
-              {/* Analysis Controls */}
               <div className="flex space-x-3">
-                <Button
-                  onClick={() => startAnalysis('multi_channel')}
-                  disabled={selectedChannels.length === 0 || startAnalysisMutation.isPending}
-                  className="bg-primary"
-                >
-                  <Layers className="h-4 w-4 mr-2" />
-                  Start Multi-Channel Analysis
-                </Button>
-                <Button
-                  onClick={() => startAnalysis('differential')}
-                  disabled={selectedChannels.length < 2 || startAnalysisMutation.isPending}
-                  variant="outline"
-                >
-                  <BarChart3 className="h-4 w-4 mr-2" />
-                  Differential Analysis
+                <Button onClick={() => handleAlgorithmRun('multi_channel')} disabled={selectedChannels.length === 0 || runAnalysisMutation.isPending || !analysisParams} className="bg-primary">
+                  <Layers className="h-4 w-4 mr-2" /> Start Multi-Channel
                 </Button>
               </div>
             </div>
           </TabsContent>
 
-          <TabsContent value="segmentation" className="space-y-4">
+          <TabsContent value="segmentation" className="space-y-4 mt-4">
             <div>
               <h4 className="text-sm font-medium text-gray-700 mb-3">Deep Learning Segmentation (U-Net)</h4>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div className="border rounded-lg p-4">
-                  <h5 className="font-medium mb-2">Model Performance</h5>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span>Dice Coefficient:</span>
-                      <span className="font-medium">0.932</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span>IoU Score:</span>
-                      <span className="font-medium">0.887</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span>Precision:</span>
-                      <span className="font-medium">0.945</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span>Recall:</span>
-                      <span className="font-medium">0.921</span>
-                    </div>
+                  <h5 className="font-medium mb-1 text-xs text-gray-500">Reference Model Performance</h5>
+                  <div className="space-y-1"> {/* Reduced spacing */}
+                    <div className="flex justify-between text-xs"><span>Dice Coeff:</span><span className="font-medium">0.932 (sample)</span></div>
+                    <div className="flex justify-between text-xs"><span>IoU Score:</span><span className="font-medium">0.887 (sample)</span></div>
                   </div>
                 </div>
-
                 <div className="border rounded-lg p-4">
-                  <h5 className="font-medium mb-2">Segmentation Results</h5>
-                  {analysisResults && analysisResults.length > 0 && (
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span>Clusters Detected:</span>
-                        <span className="font-medium">{analysisResults[0].segmentation_results.cluster_count}</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span>Total Area:</span>
-                        <span className="font-medium">{analysisResults[0].segmentation_results.total_area.toFixed(1)} km²</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span>Confidence:</span>
-                        <Badge className={getValidationColor(analysisResults[0].segmentation_results.confidence)}>
-                          {(analysisResults[0].segmentation_results.confidence * 100).toFixed(1)}%
-                        </Badge>
-                      </div>
+                  <h5 className="font-medium mb-1 text-xs text-gray-500">Latest Segmentation Run</h5>
+                  {latestHistoricalAnalysis?.segmentation_results ? (
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-xs"><span>Clusters:</span><span className="font-medium">{latestHistoricalAnalysis.segmentation_results.cluster_count}</span></div>
+                      <div className="flex justify-between text-xs"><span>Confidence:</span><Badge className={`${getValidationColor(latestHistoricalAnalysis.segmentation_results.confidence)} text-xs px-1 py-0.5`}>{(latestHistoricalAnalysis.segmentation_results.confidence * 100).toFixed(1)}%</Badge></div>
                     </div>
-                  )}
+                  ) : <p className="text-xs text-gray-500">No segmentation run details available.</p>}
                 </div>
               </div>
-
-              <Button
-                onClick={() => startAnalysis('unet_segmentation')}
-                disabled={startAnalysisMutation.isPending}
-                className="w-full bg-primary"
-              >
-                <Brain className="h-4 w-4 mr-2" />
-                Run U-Net Segmentation
+              <Button onClick={() => handleAlgorithmRun('unet_segmentation')} disabled={runAnalysisMutation.isPending || !analysisParams} className="w-full bg-primary">
+                <PlayCircle className="h-4 w-4 mr-2" /> Run U-Net Segmentation on Selected Data
               </Button>
             </div>
           </TabsContent>
-
-          <TabsContent value="tracking" className="space-y-4">
-            <div>
-              <h4 className="text-sm font-medium text-gray-700 mb-3">Temporal Tracking (LSTM/ConvLSTM)</h4>
-              
-              {analysisResults && analysisResults.length > 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="border rounded-lg p-4 text-center">
-                    <Activity className="h-8 w-8 mx-auto mb-2 text-blue-600" />
-                    <div className="text-lg font-semibold text-blue-800">
-                      {analysisResults[0].tracking_data.speed.toFixed(1)} km/h
-                    </div>
-                    <div className="text-xs text-blue-600">Movement Speed</div>
-                  </div>
-                  
-                  <div className="border rounded-lg p-4 text-center">
-                    <div className="h-8 w-8 mx-auto mb-2 bg-green-600 rounded-full flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">
-                        {analysisResults[0].tracking_data.direction.toFixed(0)}°
-                      </span>
-                    </div>
-                    <div className="text-lg font-semibold text-green-800">
-                      {analysisResults[0].tracking_data.direction > 180 ? 'SW' : 'NE'}
-                    </div>
-                    <div className="text-xs text-green-600">Direction</div>
-                  </div>
-                  
-                  <div className="border rounded-lg p-4 text-center">
-                    <div className="h-8 w-8 mx-auto mb-2 bg-purple-600 rounded-full"></div>
-                    <div className="text-lg font-semibold text-purple-800">
-                      {(analysisResults[0].tracking_data.persistence * 100).toFixed(0)}%
-                    </div>
-                    <div className="text-xs text-purple-600">Persistence</div>
-                  </div>
-                </div>
-              )}
-
-              <div className="space-y-3">
-                <Button
-                  onClick={() => startAnalysis('lstm_tracking')}
-                  disabled={startAnalysisMutation.isPending}
-                  className="w-full bg-primary"
-                >
-                  Initialize LSTM Tracking
-                </Button>
-                <Button
-                  onClick={() => startAnalysis('convlstm_tracking')}
-                  disabled={startAnalysisMutation.isPending}
-                  variant="outline"
-                  className="w-full"
-                >
-                  Initialize ConvLSTM Tracking
-                </Button>
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="validation" className="space-y-4">
-            <div>
-              <h4 className="text-sm font-medium text-gray-700 mb-3">Reanalysis Dataset Validation</h4>
-              
-              {analysisResults && analysisResults.length > 0 && (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="border rounded-lg p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium">ERA5 Correlation</span>
-                        <Badge className={getValidationColor(analysisResults[0].reanalysis_validation.era5_correlation)}>
-                          {(analysisResults[0].reanalysis_validation.era5_correlation * 100).toFixed(1)}%
-                        </Badge>
-                      </div>
-                      <Progress value={analysisResults[0].reanalysis_validation.era5_correlation * 100} className="h-2" />
-                    </div>
-                    
-                    <div className="border rounded-lg p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium">NCEP Agreement</span>
-                        <Badge className={getValidationColor(analysisResults[0].reanalysis_validation.ncep_agreement)}>
-                          {(analysisResults[0].reanalysis_validation.ncep_agreement * 100).toFixed(1)}%
-                        </Badge>
-                      </div>
-                      <Progress value={analysisResults[0].reanalysis_validation.ncep_agreement * 100} className="h-2" />
-                    </div>
-                    
-                    <div className="border rounded-lg p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium">Overall Score</span>
-                        <Badge className={getValidationColor(analysisResults[0].reanalysis_validation.validation_score)}>
-                          {(analysisResults[0].reanalysis_validation.validation_score * 100).toFixed(1)}%
-                        </Badge>
-                      </div>
-                      <Progress value={analysisResults[0].reanalysis_validation.validation_score * 100} className="h-2" />
-                    </div>
-                  </div>
-
-                  <div className="border rounded-lg p-4 bg-blue-50">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <Database className="h-4 w-4 text-blue-600" />
-                      <span className="text-sm font-medium text-blue-800">Validation Status</span>
-                    </div>
-                    <p className="text-sm text-blue-700">
-                      Analysis validated against ERA5 reanalysis and NCEP datasets. 
-                      High correlation indicates reliable tropical cloud cluster identification.
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              <Button
-                onClick={() => startAnalysis('reanalysis_validation')}
-                disabled={startAnalysisMutation.isPending}
-                className="w-full bg-primary"
-              >
-                <AlertTriangle className="h-4 w-4 mr-2" />
-                Run Reanalysis Validation
-              </Button>
-            </div>
-          </TabsContent>
+          {/* Other Tabs (Tracking, Validation) would follow similar structure */}
+           <TabsContent value="tracking" className="mt-4"><p className="text-sm text-gray-500">Temporal tracking features coming soon.</p></TabsContent>
+           <TabsContent value="validation" className="mt-4"><p className="text-sm text-gray-500">Reanalysis validation features coming soon.</p></TabsContent>
         </Tabs>
 
-        {/* Real-time Status */}
         <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+          {/* Status line can be simplified or made more dynamic */}
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full status-pulse"></div>
-              <span className="text-gray-700">
-                INSAT Data Stream Active • 
-                IST: {new Date().toLocaleTimeString('en-IN', {
-                  timeZone: 'Asia/Kolkata',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  second: '2-digit'
-                })}
-              </span>
+              <div className={`w-2 h-2 rounded-full ${currentSourceData ? 'bg-green-500 status-pulse' : 'bg-gray-400'}`}></div>
+              <span className="text-gray-700">Source Data Status: {currentSourceData ? 'Loaded' : 'Pending selection'}</span>
             </div>
-            <span className="text-gray-500">
-              {analysisResults?.length || 0} analyses completed
-            </span>
+            <span className="text-gray-500">{historicalAnalyses?.length || 0} historical analyses available</span>
           </div>
         </div>
       </CardContent>
