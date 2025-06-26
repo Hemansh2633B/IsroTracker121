@@ -13,8 +13,21 @@ import {
   type SystemStatus,
   type InsertSystemStatus,
   type ProcessingJob,
-  type InsertProcessingJob
+  type InsertProcessingJob,
+  type CommunityReport,
+  type InsertCommunityReport
+  // PushSubscription is a DOM type, not from schema, handle it directly or define a simplified version if needed for storage
 } from "@shared/schema";
+
+// Define a simple structure for storing subscriptions if not using the full PushSubscription DOM object
+export interface StoredPushSubscription {
+  endpoint: string;
+  keys: {
+    p256dh: string;
+    auth: string;
+  };
+}
+
 
 export interface IStorage {
   // User methods
@@ -40,6 +53,15 @@ export interface IStorage {
   getProcessingJobs(): Promise<ProcessingJob[]>;
   createProcessingJob(job: InsertProcessingJob): Promise<ProcessingJob>;
   updateProcessingJob(id: number, job: Partial<InsertProcessingJob>): Promise<ProcessingJob | undefined>;
+
+  // Community Report methods
+  getCommunityReports(): Promise<CommunityReport[]>;
+  createCommunityReport(report: InsertCommunityReport): Promise<CommunityReport>;
+
+  // Push Subscription methods
+  savePushSubscription(subscription: StoredPushSubscription): Promise<void>;
+  getAllPushSubscriptions(): Promise<StoredPushSubscription[]>;
+  removePushSubscription(endpoint: string): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -48,6 +70,8 @@ export class MemStorage implements IStorage {
   private satelliteData: Map<number, SatelliteData>;
   private systemStatus: Map<string, SystemStatus>;
   private processingJobs: Map<number, ProcessingJob>;
+  private communityReports: Map<number, CommunityReport>;
+  private pushSubscriptions: Map<string, StoredPushSubscription>; // Keyed by endpoint for easy lookup/removal
   private currentId: number;
 
   constructor() {
@@ -56,6 +80,8 @@ export class MemStorage implements IStorage {
     this.satelliteData = new Map();
     this.systemStatus = new Map();
     this.processingJobs = new Map();
+    this.communityReports = new Map();
+    this.pushSubscriptions = new Map(); // Added
     this.currentId = 1;
     
     // Initialize with sample system status
@@ -287,6 +313,46 @@ export class MemStorage implements IStorage {
     };
     this.processingJobs.set(id, updated);
     return updated;
+  }
+
+  // Community Report methods
+  async getCommunityReports(): Promise<CommunityReport[]> {
+    return Array.from(this.communityReports.values()).sort((a, b) => b.submittedAt.getTime() - a.submittedAt.getTime());
+  }
+
+  async createCommunityReport(report: InsertCommunityReport): Promise<CommunityReport> {
+    const id = this.currentId++;
+    const newReport: CommunityReport = {
+      id,
+      satelliteName: report.satelliteName,
+      sightingTime: new Date(report.sightingTime), // Ensure it's a Date object
+      latitude: report.latitude,
+      longitude: report.longitude,
+      notes: report.notes || null,
+      submittedAt: new Date()
+    };
+    this.communityReports.set(id, newReport);
+    return newReport;
+  }
+
+  // Push Subscription methods
+  async savePushSubscription(subscription: StoredPushSubscription): Promise<void> {
+    // Using endpoint as a unique key for the subscription
+    this.pushSubscriptions.set(subscription.endpoint, subscription);
+    console.log('Push subscription saved:', subscription.endpoint);
+  }
+
+  async getAllPushSubscriptions(): Promise<StoredPushSubscription[]> {
+    return Array.from(this.pushSubscriptions.values());
+  }
+
+  async removePushSubscription(endpoint: string): Promise<void> {
+    if (this.pushSubscriptions.has(endpoint)) {
+      this.pushSubscriptions.delete(endpoint);
+      console.log('Push subscription removed:', endpoint);
+    } else {
+      console.log('Attempted to remove non-existent push subscription:', endpoint);
+    }
   }
 }
 

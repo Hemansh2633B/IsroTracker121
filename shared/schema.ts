@@ -85,3 +85,23 @@ export type SystemStatus = typeof systemStatus.$inferSelect;
 export type InsertSystemStatus = z.infer<typeof insertSystemStatusSchema>;
 export type ProcessingJob = typeof processingJobs.$inferSelect;
 export type InsertProcessingJob = z.infer<typeof insertProcessingJobSchema>;
+
+// Schema for Community Satellite Sighting Reports
+export const communityReports = pgTable("community_reports", {
+  id: serial("id").primaryKey(),
+  satelliteName: text("satellite_name").notNull(),
+  sightingTime: timestamp("sighting_time").notNull(), // User-provided time of sighting
+  latitude: real("latitude").notNull(),
+  longitude: real("longitude").notNull(),
+  notes: text("notes"),
+  submittedAt: timestamp("submitted_at").defaultNow(), // Server time of submission
+  // userId: integer("user_id").references(() => users.id), // Optional: if user auth is added
+});
+
+export const insertCommunityReportSchema = createInsertSchema(communityReports).omit({
+  id: true,
+  submittedAt: true,
+});
+
+export type CommunityReport = typeof communityReports.$inferSelect;
+export type InsertCommunityReport = z.infer<typeof insertCommunityReportSchema>;

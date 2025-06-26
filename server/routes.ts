@@ -1,9 +1,16 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
+import { storage, StoredPushSubscription } from "./storage"; // Import StoredPushSubscription
 import multer from "multer";
+import { postUpcomingLaunchUpdate } from "./socialService";
+import { sendPushNotificationToAll, PushNotificationPayload } from "./pushNotificationService"; // Import push service
 import { z } from "zod";
-import { insertCloudClusterSchema, insertSatelliteDataSchema, insertProcessingJobSchema } from "@shared/schema";
+import {
+  insertCloudClusterSchema,
+  insertSatelliteDataSchema,
+  insertProcessingJobSchema,
+  insertCommunityReportSchema // Added for community reports
+} from "@shared/schema";
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -1060,6 +1067,109 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     } catch (error) {
       res.status(500).json({ error: "Failed to export data" });
+    }
+  });
+
+  // Route to trigger a social media post about an upcoming launch
+  app.post("/api/social/post-launch-update", async (req, res) => {
+    // In a real application, this endpoint should be protected (e.g., admin only, or called by a secure scheduler)
+    try {
+      const result = await postUpcomingLaunchUpdate();
+      if (result.success) {
+        res.json({ success: true, message: result.message, details: result });
+      } else {
+        // Determine appropriate status code based on failure type if possible
+        // For now, using 500 for general failure, 404 if no launch found, etc.
+        let statusCode = 500;
+        if (result.message.includes("No suitable upcoming launches") || result.message.includes("No new upcoming launches")) {
+          statusCode = 404;
+        } else if (result.message.includes("Twitter client not initialized")) {
+          statusCode = 503; // Service Unavailable
+        }
+        res.status(statusCode).json({ success: false, message: result.message, details: result });
+      }
+    } catch (error: any) {
+      console.error("Error in /api/social/post-launch-update endpoint:", error);
+      res.status(500).json({ success: false, message: "Internal server error while trying to post social update.", error: error.message });
+    }
+  });
+
+  // Community Reports Endpoints
+  app.get("/api/community-reports", async (req, res) => {
+    try {
+      const reports = await storage.getCommunityReports();
+      res.json(reports);
+    } catch (error) {
+      console.error("Error fetching community reports:", error);
+      res.status(500).json({ error: "Failed to fetch community reports" });
+    }
+  });
+
+  app.post("/api/community-reports", async (req, res) => {
+    try {
+      const reportData = insertCommunityReportSchema.parse(req.body);
+      // Convert sightingTime to Date object if it's a string, Zod might not do this automatically for custom parsing
+      // However, our MemStorage createCommunityReport already handles new Date(report.sightingTime)
+      const newReport = await storage.createCommunityReport(reportData);
+      res.status(201).json(newReport);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: "Invalid report data", details: error.errors });
+      } else {
+        console.error("Error creating community report:", error);
+        res.status(500).json({ error: "Failed to create community report" });
+      }
+    }
+  });
+
+  // Push Notification Endpoints
+  app.post("/api/push/subscribe", async (req, res) => {
+    try {
+      const subscription = req.body as StoredPushSubscription; // Assume client sends a valid StoredPushSubscription structure
+      // Basic validation (more robust validation might be needed in a real app)
+      if (!subscription || !subscription.endpoint || !subscription.keys || !subscription.keys.p256dh || !subscription.keys.auth) {
+        return res.status(400).json({ error: "Invalid push subscription object received." });
+      }
+      await storage.savePushSubscription(subscription);
+      res.status(201).json({ message: "Subscription saved." });
+    } catch (error: any) {
+      console.error("Error saving push subscription:", error);
+      res.status(500).json({ error: "Failed to save push subscription.", details: error.message });
+    }
+  });
+
+  app.post("/api/push/unsubscribe", async (req, res) => {
+    try {
+      const { endpoint } = req.body; // Client should send its endpoint to unsubscribe
+      if (!endpoint) {
+        return res.status(400).json({ error: "Endpoint is required to unsubscribe." });
+      }
+      await storage.removePushSubscription(endpoint);
+      res.status(200).json({ message: "Subscription removed." });
+    } catch (error: any) {
+      console.error("Error removing push subscription:", error);
+      res.status(500).json({ error: "Failed to remove push subscription.", details: error.message });
+    }
+  });
+
+  app.post("/api/push/send-test-notification", async (req, res) => {
+    // This should be protected in a real app (e.g., admin only)
+    try {
+      const payload: PushNotificationPayload = {
+        title: "Test Notification from ISRO App",
+        body: "Hello! This is a test push notification.",
+        icon: "/client/src/assets/isro-logo.svg", // Ensure this path is accessible from web root
+        url: "/", // URL to open on click
+      };
+      const result = await sendPushNotificationToAll(payload);
+      if (result.success || (result.results && result.results.length > 0)) { // Success if at least one attempted/sent
+        res.json({ success: true, message: result.message, details: result.results });
+      } else {
+        res.status(500).json({ success: false, message: result.message || "Failed to send any notifications." });
+      }
+    } catch (error: any) {
+      console.error("Error sending test notification:", error);
+      res.status(500).json({ error: "Failed to send test notification.", details: error.message });
     }
   });
 

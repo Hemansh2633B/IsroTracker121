@@ -1,0 +1,136 @@
+{
+  "appTitle": "MIPID",
+  "appSubtitle": "वर्षा पहचान के लिए इसरो मशीन इंटेलिजेंस",
+  "exportDataButton": "डेटा निर्यात करें",
+  "themeToggle": "थीम बदलें",
+  "header": {
+    "mosdacConnected": "MOSDAC कनेक्टेड",
+    "mosdacOffline": "MOSDAC ऑफलाइन"
+  },
+  "sidebar": {
+    "dashboard": "डैशबोर्ड",
+    "live3DOrbits": "लाइव 3D कक्षाएँ",
+    "smartLaunchAlerts": "स्मार्ट लॉन्च अलर्ट",
+    "voiceControl": "वॉइस कंट्रोल",
+    "communityReports": "सामुदायिक रिपोर्ट",
+    "budgetCharts": "बजट चार्ट",
+    "notificationSettings": "अधिसूचना सेटिंग्स",
+    "arSkyView": "AR स्काई व्यू (प्रायोगिक)",
+    "learningMode": "लर्निंग मोड",
+    "systemStatusTitle": "सिस्टम स्थिति",
+    "mosdacAPI": "MOSDAC API",
+    "aiModels": "AI मॉडल्स",
+    "dataProcessing": "डेटा प्रोसेसिंग"
+  },
+  "liveOrbitsGlobe": {
+    "title": "लाइव 3D सैटेलाइट कक्षाएँ"
+  },
+  "smartAlerts": {
+    "title": "स्मार्ट लॉन्च अलर्ट",
+    "loading": "आगामी लॉन्च लोड हो रहे हैं...",
+    "noLaunches": "मानदंडों से मेल खाने वाले कोई आगामी लॉन्च नहीं मिले।",
+    "errorPrefix": "त्रुटि",
+    "lspPrefix": "LSP",
+    "statusPrefix": "स्थिति",
+    "netPrefix": "NET",
+    "padPrefix": "पैड",
+    "weatherConcernSource": "मौसम चिंता (स्रोत से):",
+    "smartAlertRisk": "स्मार्ट अलर्ट ({{level}} जोखिम):"
+  },
+  "voiceControl": {
+    "title": "वॉइस कंट्रोल",
+    "askButtonDefault": "अगले लॉन्च के बारे में पूछें",
+    "listening": "सुन रहा है...",
+    "youSaid": "आपने कहा:",
+    "response": "प्रतिक्रिया:",
+    "errorPrefix": "त्रुटि"
+  },
+  "communityReportForm": {
+    "title": "सैटेलाइट sighting की रिपोर्ट करें",
+    "satelliteNameLabel": "सैटेलाइट का नाम*",
+    "sightingTimeLabel": "Sighting की तारीख और समय*",
+    "latitudeLabel": "अक्षांश*",
+    "longitudeLabel": "देशांतर*",
+    "geolocateButton": "मेरी वर्तमान लोकेशन का उपयोग करें",
+    "notesLabel": "टिप्पणियाँ (वैकल्पिक)",
+    "submitButton": "रिपोर्ट सबमिट करें",
+    "submittingButton": "सबमिट हो रहा है..."
+  },
+  "communityReportList": {
+    "title": "सामुदायिक सैटेलाइट Sightings",
+    "loading": "Sighting रिपोर्ट लोड हो रही हैं...",
+    "noReports": "अभी तक कोई sighting रिपोर्ट सबमिट नहीं की गई है।"
+  },
+  "budgetChart": {
+    "title": "इसरो वार्षिक बजट आवंटन (नाममात्र)"
+  },
+  "notificationSettings": {
+    "title": "पुश अधिसूचना सेटिंग्स",
+    "buttonUnsubscribe": "अधिसूचनाओं से अनसब्सक्राइब करें",
+    "buttonSubscribe": "अधिसूचनाओं के लिए सब्सक्राइब करें"
+  },
+  "arSkyView": {
+    "title": "AR स्काई व्यू (प्रायोगिक)"
+  },
+  "infoIconLabel": "{{topic}} के बारे में और जानें",
+  "liveLaunchCountdown": {
+    "loading": "अगला लॉन्च लोड हो रहा है...",
+    "error": "लॉन्च डेटा लोड करने में त्रुटि।",
+    "noLaunch": "कोई आगामी लॉन्च निर्धारित या TBC नहीं है।",
+    "title": "अगला लॉन्च काउंटडाउन",
+    "lsp": "LSP",
+    "targetTime": "लक्ष्य",
+    "days": "दिन",
+    "hours": "घंटे",
+    "minutes": "मिनट",
+    "seconds": "सेकंड",
+    "launched": "लॉन्च हो गया! स्थिति अपडेट की प्रतीक्षा है।",
+    "calculating": "काउंटडाउन की गणना हो रही है...",
+    "status": "स्थिति",
+    "probability": "संभावना"
+  },
+  "missionTimeline": {
+    "title": "मिशन टाइमलाइन"
+  },
+  "missionEvents": {
+    "e1": { "eventName": "लॉन्च रिहर्सल पूर्ण" },
+    "e2": { "eventName": "अंतिम काउंटडाउन शुरू" },
+    "e3": { "eventName": "लिफ्टऑफ!", "details": "PSLV सतीश धवन अंतरिक्ष केंद्र से उड़ान भरता है।" },
+    "e4": { "eventName": "PS1 पृथक्करण", "details": "पहला चरण (PS1) अलग होता है।" },
+    "e5": { "eventName": "PS2 पृथक्करण", "details": "दूसरा चरण (PS2) अलग होता है।" },
+    "e6": { "eventName": "हीट शील्ड पृथक्करण", "details": "पेलोड फेयरिंग (हीट शील्ड) को अलग किया जाता है।" },
+    "e7": { "eventName": "PS3 पृथक्करण", "details": "तीसरा चरण (PS3) अलग होता है।" },
+    "e8": { "eventName": "डेमोसैट सैटेलाइट पृथक्करण", "details": "प्राथमिक पेलोड डेमोसैट लक्ष्य कक्षा में तैनात किया गया।" },
+    "e9": { "eventName": "कक्षा स्थिरीकरण प्रक्रियाएं", "details": "सैटेलाइट प्रारंभिक स्वास्थ्य जांच और स्थिरीकरण करता है।" }
+  },
+  "launchStream": {
+    "loading": "लाइव लॉन्च स्ट्रीम की जांच हो रही है...",
+    "error": "स्ट्रीम की जांच में त्रुटि।",
+    "liveTitle": "लाइव लॉन्च स्ट्रीम",
+    "status": "स्थिति",
+    "noStreamTitle": "लॉन्च स्ट्रीम",
+    "noStreamAvailable": "वर्तमान में कोई लाइव लॉन्च स्ट्रीम नहीं मिली या जल्द ही शुरू होने वाली नहीं है।",
+    "checkLater": "निर्धारित वेबकास्ट के लिए आधिकारिक इसरो चैनलों की जांच करें।"
+  },
+  "missionControl": {
+    "loading": "मिशन कंट्रोल डेटा लोड हो रहा है...",
+    "error": "मिशन कंट्रोल के लिए डेटा लोड करने में त्रुटि।",
+    "noLaunch": "मिशन कंट्रोल डिस्प्ले के लिए कोई उपयुक्त लॉन्च नहीं मिला।",
+    "title": "मिशन कंट्रोल",
+    "lsp": "LSP",
+    "launchTime": "प्रक्षेपण",
+    "altitude": "ऊंचाई",
+    "speed": "गति",
+    "currentPhase": "वर्तमान चरण",
+    "phasePreLaunch": "प्री-लॉन्च",
+    "phaseAscent1": "प्रारंभिक चढ़ाई",
+    "phaseAscent2": "ऊपरी चरण बर्न",
+    "phaseCoasting": "कक्षा की ओर कोस्टिंग",
+    "phaseOrbitAchieved": "कक्षा प्राप्त",
+    "phaseMissionEnded": "अंतिम स्थिति / पोस्ट-डिप्लॉयमेंट की प्रतीक्षा है",
+    "phaseMissionSuccess": "मिशन सफल",
+    "phaseScheduled": "निर्धारित",
+    "simulationNote": "टेलीमेट्री डेटा प्रदर्शन उद्देश्यों के लिए सिम्युलेटेड है।",
+    "status": "आधिकारिक स्थिति"
+  }
+}
