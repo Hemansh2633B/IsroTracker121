@@ -13,15 +13,16 @@
   --card-foreground: hsl(222, 84%, 4.9%);
   --border: hsl(214, 32%, 91%);
   --input: hsl(214, 32%, 91%);
-  --primary: hsl(214, 100%, 33%);
-  --primary-foreground: hsl(0, 0%, 100%);
+  /* ISRO App New Theme Color: #d728d0 (approx HSL: 302, 69%, 50%) */
+  --primary: hsl(302, 69%, 50%);
+  --primary-foreground: hsl(0, 0%, 100%); /* White for good contrast on magenta */
   --secondary: hsl(210, 40%, 96%);
   --secondary-foreground: hsl(222, 84%, 4.9%);
-  --accent: hsl(210, 40%, 96%);
-  --accent-foreground: hsl(222, 84%, 4.9%);
+  --accent: hsl(302, 69%, 50%); /* Using primary as accent for now */
+  --accent-foreground: hsl(0, 0%, 100%);
   --destructive: hsl(0, 84%, 60%);
   --destructive-foreground: hsl(210, 40%, 98%);
-  --ring: hsl(214, 100%, 33%);
+  --ring: hsl(302, 69%, 50%); /* Match primary for focus rings */
   --radius: 0.5rem;
   --success: hsl(142, 76%, 36%);
   --warning: hsl(32, 95%, 44%);
@@ -39,17 +40,18 @@
   --card-foreground: hsl(210, 40%, 98%);
   --border: hsl(217, 32%, 17.5%);
   --input: hsl(217, 32%, 17.5%);
-  --primary: hsl(214, 100%, 33%);
-  --primary-foreground: hsl(0, 0%, 100%);
+  /* ISRO App New Theme Color (Dark Mode): #d728d0 (HSL: 302, 69%, 50%) - adjusting lightness for dark bg */
+  --primary: hsl(302, 75%, 60%); /* Slightly lighter/more vibrant magenta for dark mode */
+  --primary-foreground: hsl(0, 0%, 100%); /* White still works */
   --secondary: hsl(217, 32%, 17.5%);
   --secondary-foreground: hsl(210, 40%, 98%);
-  --accent: hsl(217, 32%, 17.5%);
-  --accent-foreground: hsl(210, 40%, 98%);
-  --destructive: hsl(0, 62%, 30%);
-  --destructive-foreground: hsl(210, 40%, 98%);
-  --ring: hsl(214, 100%, 33%);
-  --success: hsl(142, 76%, 36%);
-  --warning: hsl(32, 95%, 44%);
+  --accent: hsl(302, 75%, 60%); /* Using primary as accent for now */
+  --accent-foreground: hsl(0, 0%, 100%);
+  --destructive: hsl(0, 70%, 50%); /* Adjusted for better visibility on dark */
+  --destructive-foreground: hsl(0, 0%, 100%);
+  --ring: hsl(302, 75%, 60%); /* Match primary for focus rings */
+  --success: hsl(142, 60%, 40%); /* Slightly adjusted for dark */
+  --warning: hsl(38, 92%, 55%); /* Slightly adjusted for dark */
   --error: hsl(0, 84%, 60%);
 }
 

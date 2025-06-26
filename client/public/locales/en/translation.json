@@ -1,0 +1,180 @@
+{
+  "appTitle": "MIPID",
+  "appSubtitle": "ISRO Machine Intelligence for Precipitation ID",
+  "exportDataButton": "Export Data",
+  "themeToggle": "Toggle theme",
+  "header": {
+    "mosdacConnected": "MOSDAC Connected",
+    "mosdacOffline": "MOSDAC Offline"
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "live3DOrbits": "Live 3D Orbits",
+    "smartLaunchAlerts": "Smart Launch Alerts",
+    "voiceControl": "Voice Control",
+    "communityReports": "Community Reports",
+    "budgetCharts": "Budget Charts",
+    "notificationSettings": "Notification Settings",
+    "arSkyView": "AR Sky View (Experimental)",
+    "learningMode": "Learning Mode",
+    "systemStatusTitle": "System Status",
+    "mosdacAPI": "MOSDAC API",
+    "aiModels": "AI Models",
+    "dataProcessing": "Data Processing"
+  },
+  "liveOrbitsGlobe": {
+    "title": "Live 3D Satellite Orbits"
+  },
+  "smartAlerts": {
+    "title": "Smart Launch Alerts",
+    "loading": "Loading upcoming launches...",
+    "noLaunches": "No upcoming launches found matching criteria.",
+    "errorPrefix": "Error",
+    "lspPrefix": "LSP",
+    "statusPrefix": "Status",
+    "netPrefix": "NET",
+    "padPrefix": "Pad",
+    "weatherConcernSource": "Weather Concern (from source):",
+    "smartAlertRisk": "Smart Alert ({{level}} Risk):"
+  },
+  "voiceControl": {
+    "title": "Voice Control",
+    "askButtonDefault": "Ask about Next Launch",
+    "listening": "Listening...",
+    "youSaid": "You said:",
+    "response": "Response:",
+    "errorPrefix": "Error",
+    "unsupported": "Speech recognition not supported by this browser.",
+    "didNotRecognize": "I didn't recognize that. Please try again.",
+    "fetchLaunchError": "Sorry, I had trouble fetching launch information.",
+    "commandNotUnderstood": "I'm not sure how to help with that. Try asking about the next launch."
+  },
+  "communityReportForm": {
+    "title": "Report a Satellite Sighting",
+    "satelliteNameLabel": "Satellite Name*",
+    "satelliteNamePlaceholder": "e.g., ISS, Starlink-1234",
+    "sightingTimeLabel": "Sighting Date and Time*",
+    "latitudeLabel": "Latitude*",
+    "latitudePlaceholder": "e.g., 28.5619",
+    "longitudeLabel": "Longitude*",
+    "longitudePlaceholder": "e.g., -80.5773",
+    "geolocateButton": "Use My Current Location",
+    "notesLabel": "Notes (optional)",
+    "notesPlaceholder": "e.g., Brightness, direction of travel, weather conditions...",
+    "submitButton": "Submit Report",
+    "submittingButton": "Submitting...",
+    "errorRequiredFields": "Please fill in all required fields (Satellite Name, Sighting Time, Latitude, Longitude).",
+    "successMessage": "Your sighting report has been submitted.",
+    "submissionFailed": "Submission Failed",
+    "locationUpdated": "Current location fetched.",
+    "geolocationError": "Could not get location: {{message}}",
+    "geolocationNotSupported": "Your browser doesn't support geolocation."
+  },
+  "communityReportList": {
+    "title": "Community Satellite Sightings",
+    "loading": "Loading sighting reports...",
+    "errorPrefix": "Error loading reports:",
+    "noReports": "No sighting reports submitted yet.",
+    "sighted": "Sighted",
+    "location": "Location",
+    "notesPrefix": "Notes",
+    "reported": "Reported"
+  },
+  "budgetChart": {
+    "title": "ISRO Annual Budget Allocation (Nominal)",
+    "yAxisLabel": "Budget (₹ Crore)",
+    "xAxisLabel": "Fiscal Year",
+    "tooltipLabel": "ISRO Budget (₹ Crore)",
+    "dataSourceNote": "Data manually curated from Wikipedia (ISRO article, Budget section) for demonstration. For official figures, please refer to Department of Space budget documents."
+  },
+  "notificationSettings": {
+    "title": "Push Notification Settings",
+    "notSupported": "Push notifications are not supported by your browser.",
+    "permissionBlocked": "Notification permission is blocked. Please enable it in your browser settings.",
+    "buttonUnsubscribe": "Unsubscribe from Notifications",
+    "buttonSubscribe": "Subscribe to Notifications",
+    "buttonProcessing": "Processing...",
+    "subscribedToast": "You will now receive push notifications.",
+    "unsubscribedToast": "You will no longer receive push notifications.",
+    "subscribeErrorToast": "Could not subscribe to push notifications. Ensure VAPID key is set.",
+    "unsubscribeErrorToast": "Could not unsubscribe.",
+    "permissionDeniedToast": "Notification permission was not granted.",
+    "saveSubscriptionErrorToast": "Could not save subscription to server.",
+    "refreshNote": "You might need to refresh the page after changing notification permissions in your browser settings."
+  },
+  "arSkyView": {
+    "title": "AR Sky View (Experimental)",
+    "errorPrefix": "Error",
+    "unsupportedError": "Your browser/device may not support WebXR/AR.",
+    "locationStatus": "Location",
+    "orientationStatus": "Orientation",
+    "gettingLocation": "Getting...",
+    "note": "Note: This feature requires a device with camera and orientation sensors, and browser support for WebXR/DeviceOrientation. Accuracy may vary. For best results, use on a mobile device and grant necessary permissions."
+  },
+  "learningModal": {
+    "errorTitle": "Error",
+    "contentNotFound": "Learning content for topic ID \"{{topicId}}\" not found.",
+    "closeButton": "Close"
+  },
+  "infoIconLabel": "Learn more about {{topic}}",
+  "liveLaunchCountdown": {
+    "loading": "Loading next launch...",
+    "error": "Error loading launch data.",
+    "noLaunch": "No upcoming launches scheduled or TBC.",
+    "title": "Next Launch Countdown",
+    "lsp": "LSP",
+    "targetTime": "Target",
+    "days": "Days",
+    "hours": "Hours",
+    "minutes": "Minutes",
+    "seconds": "Seconds",
+    "launched": "Launched! Awaiting status update.",
+    "calculating": "Calculating countdown...",
+    "status": "Status",
+    "probability": "probability"
+  },
+  "missionTimeline": {
+    "title": "Mission Timeline"
+  },
+  "missionEvents": {
+    "e1": { "eventName": "Launch Rehearsal Complete" },
+    "e2": { "eventName": "Final Countdown Started" },
+    "e3": { "eventName": "Liftoff!", "details": "PSLV lifts off from Satish Dhawan Space Centre." },
+    "e4": { "eventName": "PS1 Separation", "details": "First stage (PS1) separates." },
+    "e5": { "eventName": "PS2 Separation", "details": "Second stage (PS2) separates." },
+    "e6": { "eventName": "Heat Shield Separation", "details": "Payload fairing (heat shield) is jettisoned." },
+    "e7": { "eventName": "PS3 Separation", "details": "Third stage (PS3) separates." },
+    "e8": { "eventName": "DemoSat Satellite Separation", "details": "Primary payload DemoSat deployed into target orbit." },
+    "e9": { "eventName": "Orbit Stabilization Maneuvers", "details": "Satellite performs initial health checks and stabilization." }
+  },
+  "launchStream": {
+    "loading": "Checking for live launch streams...",
+    "error": "Error checking for streams.",
+    "liveTitle": "Live Launch Stream",
+    "status": "Status",
+    "noStreamTitle": "Launch Streams",
+    "noStreamAvailable": "No live launch streams currently detected or starting very soon.",
+    "checkLater": "Check official ISRO channels for scheduled webcasts."
+  },
+  "missionControl": {
+    "loading": "Loading Mission Control Data...",
+    "error": "Error loading data for Mission Control.",
+    "noLaunch": "No suitable launch found for Mission Control display.",
+    "title": "Mission Control",
+    "lsp": "LSP",
+    "launchTime": "Launch",
+    "altitude": "Altitude",
+    "speed": "Speed",
+    "currentPhase": "Current Phase",
+    "phasePreLaunch": "Pre-Launch",
+    "phaseAscent1": "Initial Ascent",
+    "phaseAscent2": "Upper Stage Burn",
+    "phaseCoasting": "Coasting to Orbit",
+    "phaseOrbitAchieved": "Orbit Achieved",
+    "phaseMissionEnded": "Awaiting Final Status / Post-Deployment",
+    "phaseMissionSuccess": "Mission Successful",
+    "phaseScheduled": "Scheduled",
+    "simulationNote": "Telemetry data is simulated for demonstration purposes.",
+    "status": "Official Status"
+  }
+}

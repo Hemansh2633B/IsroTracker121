@@ -8,21 +8,30 @@ import {
   History,
   Settings
 } from "lucide-react";
-
-const navigationItems = [
-  { name: "Dashboard", icon: LayoutDashboard, href: "#", active: true },
-  { name: "Satellite Data", icon: Satellite, href: "#", active: false },
-  { name: "AI Detection", icon: Brain, href: "#", active: false },
-  { name: "Analysis", icon: BarChart3, href: "#", active: false },
-  { name: "Historical Data", icon: History, href: "#", active: false },
-  { name: "Admin Panel", icon: Settings, href: "#admin", active: false },
-];
+import { useTranslation } from 'react-i18next';
 
 export function Sidebar() {
+  const { t } = useTranslation();
   const { data: systemStatus } = useQuery({
     queryKey: ["/api/system-status"],
     refetchInterval: 3000, // Fast auto-refresh every 3 seconds
   });
+
+  // Define navigation items with translation keys
+  // Assuming these keys exist in your translation files (e.g., sidebar.dashboard, sidebar.live3DOrbits)
+  // For items not yet translated, they will show their keys or you can provide a default.
+  const navigationItems = [
+    { name: t("sidebar.dashboard", "Dashboard"), icon: LayoutDashboard, href: "#dashboard", active: true }, // Default to "Dashboard" if key not found
+    { name: t("sidebar.live3DOrbits", "Live 3D Orbits"), icon: Satellite, href: "#liveOrbits", active: false },
+    { name: t("sidebar.smartLaunchAlerts", "Smart Alerts"), icon: BarChart3, href: "#smartAlerts", active: false },
+    { name: t("sidebar.voiceControl", "Voice Control"), icon: Brain, href: "#voiceControl", active: false }, // Assuming 'Brain' icon for Voice
+    { name: t("sidebar.communityReports", "Community Reports"), icon: History, href: "#community", active: false }, // Assuming 'History' for reports
+    { name: t("sidebar.budgetCharts", "Budget Charts"), icon: BarChart3, href: "#budget", active: false },
+    { name: t("sidebar.notificationSettings", "Notifications"), icon: Settings, href: "#notifications", active: false },
+    { name: t("sidebar.arSkyView", "AR Sky View"), icon: Satellite, href: "#arView", active: false },
+    // { name: t("sidebar.adminPanel", "Admin Panel"), icon: Settings, href: "#admin", active: false }, // Example for admin
+  ];
+
 
   const getStatusInfo = (component: string) => {
     const status = systemStatus?.find((s: any) => s.component === component);
@@ -58,11 +67,11 @@ export function Sidebar() {
       </nav>
       
       <div className="px-4 py-4 border-t border-gray-200 mt-4">
-        <h3 className="text-sm font-medium text-gray-700 mb-3">System Status</h3>
+        <h3 className="text-sm font-medium text-gray-700 mb-3">{t('sidebar.systemStatusTitle', "System Status")}</h3>
         
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600">MOSDAC API</span>
+            <span className="text-sm text-gray-600">{t('sidebar.mosdacAPI', "MOSDAC API")}</span>
             <div className="flex items-center space-x-1">
               <span className={cn(
                 "w-2 h-2 rounded-full",
@@ -78,7 +87,7 @@ export function Sidebar() {
           </div>
           
           <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600">AI Models</span>
+            <span className="text-sm text-gray-600">{t('sidebar.aiModels', "AI Models")}</span>
             <div className="flex items-center space-x-1">
               <span className={cn(
                 "w-2 h-2 rounded-full",
@@ -94,7 +103,7 @@ export function Sidebar() {
           </div>
           
           <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600">Data Processing</span>
+            <span className="text-sm text-gray-600">{t('sidebar.dataProcessing', "Data Processing")}</span>
             <div className="flex items-center space-x-1">
               <span className={cn(
                 "w-2 h-2 rounded-full",

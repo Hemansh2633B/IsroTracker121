@@ -3,8 +3,12 @@ import { useQuery } from "@tanstack/react-query";
 import { Download, Satellite, PersonStanding, Clock } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useState, useEffect } from "react";
+import ThemeToggle from "./ThemeToggle";
+import LanguageSwitcher from "./LanguageSwitcher"; // Import LanguageSwitcher
+import { useTranslation } from 'react-i18next';
 
 export function Header() {
+  const { t } = useTranslation();
   const [istTime, setIstTime] = useState(new Date());
 
   const { data: systemStatus } = useQuery({
@@ -81,8 +85,8 @@ export function Header() {
                 <text x="24" y="40" textAnchor="middle" fill="#ffffff" fontFamily="Arial, sans-serif" fontSize="6" fontWeight="bold">ISRO</text>
               </svg>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">MIPID</h1>
-                <p className="text-xs text-gray-500">ISRO Machine Intelligence for Precipitation ID</p>
+                <h1 className="text-xl font-bold text-gray-900">{t('appTitle')}</h1>
+                <p className="text-xs text-gray-500">{t('appSubtitle')}</p>
               </div>
             </div>
           </div>
@@ -91,17 +95,20 @@ export function Header() {
             <div className="flex items-center space-x-2 text-sm">
               <span className={`w-2 h-2 rounded-full ${isOnline ? 'bg-green-500 status-pulse' : 'bg-red-500'}`}></span>
               <span className="text-gray-600">
-                {isOnline ? 'MOSDAC Connected' : 'MOSDAC Offline'}
+                {isOnline ? t('header.mosdacConnected') : t('header.mosdacOffline')}
               </span>
             </div>
             
             <Button 
               onClick={handleExportData}
-              className="flex items-center space-x-2 bg-primary hover:bg-blue-700"
+              className="flex items-center space-x-2 bg-primary hover:bg-primary/90 text-primary-foreground" // Adjusted hover for themed primary
             >
               <Download className="h-4 w-4" />
-              <span>Export Data</span>
+              <span>{t('exportDataButton')}</span>
             </Button>
+
+            <ThemeToggle />
+            <LanguageSwitcher />
             
             <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
               <PersonStanding className="h-4 w-4 text-gray-600" />

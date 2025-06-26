@@ -232,7 +232,7 @@ export function SatelliteMap() {
         <div className="absolute bottom-10 right-4 bg-white/90 backdrop-blur-sm rounded-lg p-2 text-xs text-gray-600 z-[1000]">
           Data as of: {formatDate(lastUpdate)}
         </div>
-      </div>
+      </CardContent>
 
       <div className="p-4 border-t border-gray-200">
         <div className="flex flex-wrap items-center justify-between gap-4">

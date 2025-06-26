@@ -15,6 +15,18 @@ import { SecurityMonitor } from "@/components/security-monitor";
 import { CloudAnalysisEngine } from "@/components/cloud-analysis-engine";
 import { PaperGenerator } from "@/components/paper-generator";
 import { AdminPanel } from "@/components/admin-panel";
+import LiveOrbitsGlobe from "@/components/LiveOrbitsGlobe";
+import SmartAlertsDashboard from "@/components/SmartAlertsDashboard";
+import VoiceControl from "@/components/VoiceControl";
+import CommunityReportForm from "@/components/CommunityReportForm";
+import CommunityReportList from "@/components/CommunityReportList";
+import IsroBudgetChart from "@/components/IsroBudgetChart";
+import NotificationSettings from "@/components/NotificationSettings";
+import ARSkyView from "@/components/ARSkyView";
+import LiveLaunchCountdown from "@/components/LiveLaunchCountdown";
+import MissionTimelineDisplay from "@/components/MissionTimelineDisplay";
+import LaunchStreamEmbed from "@/components/LaunchStreamEmbed";
+import MissionControlSimplified from "@/components/MissionControlSimplified"; // Added
 import { useState, useEffect } from "react";
 import * as React from "react";
 
@@ -84,6 +96,77 @@ export default function Dashboard() {
           <div className="p-6 space-y-6">
             {/* MetricsCards might also need access to some high-level summary from analysis */}
             <MetricsCards />
+
+            {/* Live Launch Countdown */}
+            <div className="my-6"> {/* Add some margin for spacing */}
+              <LiveLaunchCountdown />
+            </div>
+
+            {/* Launch Stream Embed Section */}
+            <div className="my-6">
+              <LaunchStreamEmbed />
+            </div>
+
+            {/* Mission Control Dashboard Section */}
+            <div className="my-6">
+              <MissionControlSimplified />
+            </div>
+
+            {/* Mission Timeline Section */}
+            <div className="my-6">
+              <MissionTimelineDisplay />
+            </div>
+
+            {/* Live 3D Orbits Globe */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Live 3D Satellite Orbits</h3>
+              <div style={{ height: "600px", width: "100%" }}> {/* Container for the globe */}
+                <LiveOrbitsGlobe />
+              </div>
+            </div>
+
+            {/* Smart Alerts Dashboard */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Smart Launch Alerts</h3>
+              <SmartAlertsDashboard />
+            </div>
+
+            {/* Voice Control */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+              <VoiceControl />
+            </div>
+
+            {/* Community Reports Section */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-0"> {/* p-0 to allow form to have its own padding */}
+                <CommunityReportForm />
+              </div>
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-0"> {/* p-0 to allow list to have its own padding */}
+                <CommunityReportList />
+              </div>
+            </div>
+
+            {/* ISRO Budget Chart Section */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+              <IsroBudgetChart />
+            </div>
+
+            {/* Notification Settings Section */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+              <NotificationSettings />
+            </div>
+
+            {/* AR Sky View Section */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">AR Sky View (Experimental)</h3>
+              <div style={{ height: "70vh", width: "100%", border: "1px solid #ccc" }}> {/* Ensure container has dimensions */}
+                <ARSkyView />
+              </div>
+               <p className="text-xs text-gray-500 mt-2">
+                Note: This feature requires a device with camera and orientation sensors, and browser support for WebXR/DeviceOrientation.
+                Accuracy may vary. For best results, use on a mobile device and grant necessary permissions.
+              </p>
+            </div>
             
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2">
